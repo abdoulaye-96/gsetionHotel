@@ -127,7 +127,7 @@ const Sidebar = () => {
 
         <div style={{...menuItemStyle, backgroundColor: '#fff'}}>
           <img src="https://dashboard.codeparrot.ai/api/image/Z7ZGdDO_YEiK219m/layout-d.png" alt="Dashboard" width="23" height="23" />
-          <MenuItem to="/">
+          <MenuItem to="/dashboard">
             <span style={{...menuItemTextStyle, color: '#4d5154'}}>Dashboard</span>
           </MenuItem>
         </div>

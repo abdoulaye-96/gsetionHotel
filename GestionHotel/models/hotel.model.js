@@ -13,11 +13,12 @@ const hotelSchema = new mongoose.Schema({
   email: {
     type: String,
     required: true,
+    unique: true,
     match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Email invalide']
   },
   telephone: {
     type: String,
-    required: true,
+    required: false,
     validate: {
       validator: function(v) {
         return /^(?:\+221|00221|0)(\s?[7][0-9]\s?){8}$/.test(v);

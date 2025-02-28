@@ -19,7 +19,7 @@ function AppRoutes() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/hotels" element={<ProtectedRoute><HotelsList /></ProtectedRoute>} />
         <Route path="/addhotel" element={<ProtectedRoute><AddHotel /></ProtectedRoute>} />
         <Route path="/signup" element={<SignupForm />} />

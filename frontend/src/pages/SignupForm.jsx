@@ -165,14 +165,19 @@ const SignupForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
+    console.log('Données envoyées:', {
+      name: formData.name,
+      email: formData.email,
+      password: formData.password,
+    });
+    // console.log('Form submitted:', formData);
 
     if (!formData.acceptTerms) {
         setError('Vous devez accepter les termes et conditions.');
         return;
       }
       try {
-        const response = await axios.post('http://localhost:3000/api/signup', {
+        const response = await axios.post('http://localhost:3000/api/auth/signup', {
           name: formData.name,
           email: formData.email,
           password: formData.password,
@@ -185,6 +190,7 @@ const SignupForm = () => {
           }
         } catch (err) {
           setError(err.response?.data?.message || 'Erreur lors de l\'inscription.');
+          console.error('Erreur API:', err.response);
         }
   };
 

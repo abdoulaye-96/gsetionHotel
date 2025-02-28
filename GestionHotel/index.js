@@ -14,6 +14,20 @@ const cleanupOldFiles = require('./utils/cleanup');
 const app = express();
 app.use(express.json());
 
+
+const cors = require('cors');
+
+// Autoriser toutes les origines (pour le développement uniquement)
+app.use(cors());
+
+// Ou autoriser une origine spécifique (recommandé pour la production)
+app.use(cors({
+  origin: 'http://localhost:5173', // Remplacez par l'URL de votre frontend
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Méthodes autorisées
+  allowedHeaders: ['Content-Type', 'Authorization'], // En-têtes autorisés
+}));
+
+
 // Configuration de Multer pour le stockage des fichiers
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -127,7 +141,7 @@ app.post('/api/auth/login', async (req, res) => {
 // Routes CRUD pour les hôtels
 
 // 1. READ - Récupérer tous les hôtels
-app.get('/api/hotels', authenticateToken, async (req, res) => {
+app.get('/api/hotels', async (req, res) => {
   try {
     const hotels = await Hotel.find().sort('-createdAt');
     res.json({
@@ -143,7 +157,7 @@ app.get('/api/hotels', authenticateToken, async (req, res) => {
 });
 
 // 2. READ - Récupérer un hôtel par son ID
-app.get('/api/hotels/:id', authenticateToken, async (req, res) => {
+app.get('/api/hotels/:id', async (req, res) => {
   try {
     const hotel = await Hotel.findById(req.params.id);
     if (!hotel) {
@@ -156,7 +170,7 @@ app.get('/api/hotels/:id', authenticateToken, async (req, res) => {
 });
 
 // 3. CREATE - Créer un hôtel
-app.post('/api/hotels', authenticateToken, upload.array('photos'), validateHotelInput, async (req, res) => {
+app.post('/api/hotels',  upload.array('photos'), validateHotelInput, async (req, res) => {
   try {
     const hotelData = {
       ...req.body,
@@ -174,12 +188,15 @@ app.post('/api/hotels', authenticateToken, upload.array('photos'), validateHotel
 });
 
 // 4. UPDATE - Mettre à jour un hôtel
-app.put('/api/hotels/:id', authenticateToken, upload.array('photos'), validateHotelInput, async (req, res) => {
+app.put('/api/hotels/:id', upload.array('photos'), validateHotelInput, async (req, res) => {
   try {
+    // Convertir req.body.prixNuit en chaîne si ce n'est pas déjà le cas
+    const prixNuit = typeof req.body.prixNuit === 'string' ? req.body.prixNuit : String(req.body.prixNuit);
+
     const hotelData = {
       ...req.body,
-      prixNuit: Number(req.body.prixNuit.replace(/\D/g, '')),
-      photos: req.files?.map(file => file.path) || []
+      prixNuit: Number(prixNuit.replace(/\D/g, '')), // Nettoyer et convertir en nombre
+      photos: req.files?.map(file => file.path) || [] // Gérer les fichiers uploadés
     };
 
     const updatedHotel = await Hotel.findByIdAndUpdate(
@@ -199,9 +216,10 @@ app.put('/api/hotels/:id', authenticateToken, upload.array('photos'), validateHo
 });
 
 // 5. DELETE - Supprimer un hôtel
-app.delete('/api/hotels/:id', authenticateToken, async (req, res) => {
+app.delete('/api/hotels/:id', async (req, res) => {
   try {
     const hotel = await Hotel.findByIdAndDelete(req.params.id);
+    message = "Hôtel supprimé avec succès";
     if (!hotel) {
       return res.status(404).json({ error: "Hôtel non trouvé" });
     }
